@@ -419,8 +419,18 @@ async function cmdCheck(args = []) {
     if (pkg.version !== plugin.version) {
       fail(`${repo.path}: version mismatch (package.json=${pkg.version}, plugin.json=${plugin.version})`);
     }
+    const npmLockPath = path.join(dir, 'package-lock.json');
+    if (fs.existsSync(npmLockPath)) {
+      const lock = readJson(npmLockPath);
+      if (lock.version !== pkg.version || lock.packages?.['']?.version !== pkg.version) {
+        fail(`${repo.path}: package-lock.json version mismatch (expected ${pkg.version})`);
+      }
+    }
     if (!pkg.name?.startsWith('@farfarfun/utools-')) {
       fail(`${repo.path}: package.json#name should use @farfarfun/utools-* scope (got "${pkg.name}")`);
+    }
+    if (pkg.funbuild?.build !== 'sh build.sh') {
+      fail(`${repo.path}: package.json#funbuild.build should be "sh build.sh" (got ${JSON.stringify(pkg.funbuild?.build)})`);
     }
     if (plugin.main !== 'dist/index.html') {
       fail(`${repo.path}: plugin.json#main should be "dist/index.html" (got "${plugin.main}")`);
@@ -435,6 +445,16 @@ async function cmdCheck(args = []) {
         fail(`${repo.path}: missing referenced utools/${rel}`);
       }
     }
+    const logoPath = path.join(utoolsDir, plugin.logo || '');
+    if (plugin.logo && fs.existsSync(logoPath) && plugin.logo.endsWith('.png')) {
+      const buf = fs.readFileSync(logoPath);
+      if (buf.length < 24 || buf.toString('ascii', 1, 4) !== 'PNG' || buf.readUInt32BE(16) !== 256 || buf.readUInt32BE(20) !== 256) {
+        fail(`${repo.path}: utools/${plugin.logo} must be a 256x256 PNG`);
+      }
+    }
+    if (fs.existsSync(path.join(utoolsDir, 'logo.svg')) && plugin.logo !== 'logo.svg') {
+      fail(`${repo.path}: unreferenced utools/logo.svg should not stay in utools/ packaging directory`);
+    }
     for (const feat of plugin.features || []) {
       if (feat.icon && !fs.existsSync(path.join(utoolsDir, feat.icon))) {
         fail(`${repo.path}: missing feature icon utools/${feat.icon}`);
@@ -445,6 +465,17 @@ async function cmdCheck(args = []) {
       if (!fs.existsSync(path.join(dir, required))) {
         fail(`${repo.path}: missing ${required}`);
       }
+    }
+    const identityPath = path.join(dir, 'identity.json');
+    if (fs.existsSync(identityPath)) {
+      const identity = readJson(identityPath);
+      if (!identity.pluginId) fail(`${repo.path}: identity.json missing pluginId`);
+      for (const secretKey of ['mid', 'uid', 'cellphone']) {
+        if (secretKey in identity) fail(`${repo.path}: identity.json must not contain private field "${secretKey}"`);
+      }
+    }
+    if (fs.existsSync(path.join(dir, 'utools/build.sh'))) {
+      fail(`${repo.path}: utools/build.sh should not exist (keep single build.sh at repo root)`);
     }
 
     if (indexReadme && !indexReadme.includes(repo.name)) {
