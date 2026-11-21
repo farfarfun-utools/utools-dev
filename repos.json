@@ -5,7 +5,7 @@
       "name": "utools-mobile",
       "path": "apps/utools-mobile",
       "category": "app",
-      "branch": "main",
+      "branch": "master",
       "url": "https://github.com/farfarfun-utools/utools-mobile.git",
       "description": "FunMobile Android companion app (FunOTP + FunLink)"
     },
@@ -53,7 +53,7 @@
       "name": "utools-funimage",
       "path": "plugins/utools-funimage",
       "category": "plugin",
-      "branch": "main",
+      "branch": "master",
       "url": "https://github.com/farfarfun-utools/utools-funimage.git",
       "description": "图片工坊 FunImage"
     },
@@ -85,7 +85,7 @@
       "name": "utools-funvideo",
       "path": "plugins/utools-funvideo",
       "category": "plugin",
-      "branch": "main",
+      "branch": "master",
       "url": "https://github.com/farfarfun-utools/utools-funvideo.git",
       "description": "视频工坊 FunVideo"
     },
@@ -93,7 +93,7 @@
       "name": "utools-plugin-development",
       "path": "skills/utools-plugin-development",
       "category": "skill",
-      "branch": "main",
+      "branch": "master",
       "url": "https://github.com/farfarfun-utools/utools-plugin-development.git",
       "description": "uTools plugin development & release skill"
     },
