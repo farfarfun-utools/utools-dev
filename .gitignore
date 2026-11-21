@@ -1,0 +1,11 @@
+# Multi-repo checkouts managed by repos.json + scripts/ws.mjs
+/apps/
+/index/
+/plugins/
+/skills/
+/tools/
+
+# Local OS / editor artifacts
+.DS_Store
+Thumbs.db
+*.log

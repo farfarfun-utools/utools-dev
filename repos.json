@@ -1,0 +1,109 @@
+{
+  "org": "farfarfun-utools",
+  "repos": [
+    {
+      "name": "utools-mobile",
+      "path": "apps/utools-mobile",
+      "category": "app",
+      "branch": "main",
+      "url": "https://github.com/farfarfun-utools/utools-mobile.git",
+      "description": "FunMobile Android companion app (FunOTP + FunLink)"
+    },
+    {
+      "name": "utools-plugins",
+      "path": "index/utools-plugins",
+      "category": "index",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-plugins.git",
+      "description": "Unified index for all farfarfun-utools plugins"
+    },
+    {
+      "name": "utools-funcalc",
+      "path": "plugins/utools-funcalc",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funcalc.git",
+      "description": "算有所得 FunCalc"
+    },
+    {
+      "name": "utools-funcalendar",
+      "path": "plugins/utools-funcalendar",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funcalendar.git",
+      "description": "时光常伴 FunCalendar"
+    },
+    {
+      "name": "utools-funchat",
+      "path": "plugins/utools-funchat",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funchat.git",
+      "description": "言来语往 FunChat"
+    },
+    {
+      "name": "utools-fundoc",
+      "path": "plugins/utools-fundoc",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-fundoc.git",
+      "description": "落笔成章 FunDoc"
+    },
+    {
+      "name": "utools-funimage",
+      "path": "plugins/utools-funimage",
+      "category": "plugin",
+      "branch": "main",
+      "url": "https://github.com/farfarfun-utools/utools-funimage.git",
+      "description": "图片工坊 FunImage"
+    },
+    {
+      "name": "utools-funlink",
+      "path": "plugins/utools-funlink",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funlink.git",
+      "description": "一链即达 FunLink"
+    },
+    {
+      "name": "utools-funotp",
+      "path": "plugins/utools-funotp",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funotp.git",
+      "description": "密钥随行 FunOTP"
+    },
+    {
+      "name": "utools-funqr",
+      "path": "plugins/utools-funqr",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funqr.git",
+      "description": "码上生花 FunQR"
+    },
+    {
+      "name": "utools-funvideo",
+      "path": "plugins/utools-funvideo",
+      "category": "plugin",
+      "branch": "main",
+      "url": "https://github.com/farfarfun-utools/utools-funvideo.git",
+      "description": "视频工坊 FunVideo"
+    },
+    {
+      "name": "utools-plugin-development",
+      "path": "skills/utools-plugin-development",
+      "category": "skill",
+      "branch": "main",
+      "url": "https://github.com/farfarfun-utools/utools-plugin-development.git",
+      "description": "uTools plugin development & release skill"
+    },
+    {
+      "name": "utools-shots",
+      "path": "tools/utools-shots",
+      "category": "tool",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-shots.git",
+      "description": "Shared CDP screenshot toolchain for Vue plugins"
+    }
+  ]
+}
