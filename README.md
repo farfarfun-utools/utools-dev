@@ -28,6 +28,11 @@ node scripts/ws.mjs sync --pull
 
 # 4. 执行跨仓库一致性巡检（版本、清单资源、索引、窗口高度、移动端共享代码、截图路径）
 node scripts/ws.mjs check
+
+# 5. 统一构建全部或指定插件（新 clone 时会自动拉取未初始化的子仓库）
+sh scripts/build.sh --list
+sh scripts/build.sh --dry-run
+sh scripts/build.sh funotp funlink
 ```
 
 ## 常用开发约定

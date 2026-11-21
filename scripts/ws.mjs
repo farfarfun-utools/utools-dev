@@ -2,6 +2,7 @@
 // Multi-repo workspace helper for farfarfun-utools/utools-dev.
 // Commands:
 //   node scripts/ws.mjs status          Show git & version status of all repos
+//   node scripts/ws.mjs init            Clone missing repos (alias of sync)
 //   node scripts/ws.mjs sync [--pull]   Clone missing repos (and fast-forward clean ones with --pull)
 //   node scripts/ws.mjs check           Audit cross-repo metadata, manifests, shared code, and tools
 
@@ -80,11 +81,17 @@ function cmdSync(args) {
   const doPull = args.includes('--pull');
   for (const repo of manifest.repos) {
     const dir = path.join(ROOT, repo.path);
-    if (!fs.existsSync(dir)) {
+    const hasGit = fs.existsSync(path.join(dir, '.git'));
+    if (!fs.existsSync(dir) || (!hasGit && fs.readdirSync(dir).length === 0)) {
       fs.mkdirSync(path.dirname(dir), { recursive: true });
+      if (fs.existsSync(dir)) fs.rmdirSync(dir);
       console.log(`[clone] ${repo.path} <- ${repo.url}`);
       execFileSync('git', ['clone', '--branch', repo.branch, repo.url, dir], { stdio: 'inherit' });
       continue;
+    }
+    if (!hasGit) {
+      console.error(`[error] ${repo.path} exists and is not empty, but has no .git directory`);
+      process.exit(1);
     }
 
     if (!doPull) {
@@ -310,6 +317,7 @@ switch (command) {
   case 'status':
     cmdStatus();
     break;
+  case 'init':
   case 'sync':
     cmdSync(rest);
     break;
@@ -317,6 +325,6 @@ switch (command) {
     await cmdCheck();
     break;
   default:
-    console.error('Usage: node scripts/ws.mjs <status|sync [--pull]|check>');
+    console.error('Usage: node scripts/ws.mjs <status|init|sync [--pull]|check>');
     process.exit(2);
 }
