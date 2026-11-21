@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Multi-repo workspace helper for farfarfun-utools/utools-dev.
 // Commands:
-//   node scripts/ws.mjs status          Show git & version status of all repos
-//   node scripts/ws.mjs init            Clone missing repos (alias of sync)
-//   node scripts/ws.mjs sync [--pull]   Clone missing repos (and fast-forward clean ones with --pull)
-//   node scripts/ws.mjs check           Audit cross-repo metadata, manifests, shared code, and tools
+//   node scripts/ws.mjs status                          Show git & version status of all repos
+//   node scripts/ws.mjs init                            Clone missing repos (alias of sync)
+//   node scripts/ws.mjs sync [--pull|--reset]           Clone missing repos and optionally update existing ones
+//   node scripts/ws.mjs check                           Audit cross-repo metadata, manifests, shared code, and tools
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -78,39 +78,74 @@ function cmdStatus() {
 }
 
 function cmdSync(args) {
-  const doPull = args.includes('--pull');
+  const doReset = args.includes('--reset');
+  const doPull = doReset || args.includes('--pull');
+  const changedFlagIdx = args.indexOf('--write-changed');
+  const changedFile = changedFlagIdx >= 0 ? args[changedFlagIdx + 1] : null;
+  const changedPaths = [];
+
   for (const repo of manifest.repos) {
     const dir = path.join(ROOT, repo.path);
     const hasGit = fs.existsSync(path.join(dir, '.git'));
     if (!fs.existsSync(dir) || (!hasGit && fs.readdirSync(dir).length === 0)) {
       fs.mkdirSync(path.dirname(dir), { recursive: true });
       if (fs.existsSync(dir)) fs.rmdirSync(dir);
-      console.log(`[clone] ${repo.path} <- ${repo.url}`);
+      console.log(`[clone]  ${repo.path} <- ${repo.url}`);
       execFileSync('git', ['clone', '--branch', repo.branch, repo.url, dir], { stdio: 'inherit' });
+      changedPaths.push(repo.path);
       continue;
     }
     if (!hasGit) {
-      console.error(`[error] ${repo.path} exists and is not empty, but has no .git directory`);
+      console.error(`[error]  ${repo.path} exists and is not empty, but has no .git directory`);
       process.exit(1);
     }
 
     if (!doPull) {
-      console.log(`[ok]    ${repo.path}`);
+      console.log(`[ok]     ${repo.path}`);
+      continue;
+    }
+
+    const beforeHead = git(dir, ['rev-parse', '--short', 'HEAD'], { allowFail: true }) || '';
+
+    if (doReset) {
+      git(dir, ['fetch', 'origin', '--prune']);
+      git(dir, ['checkout', '-B', repo.branch, `origin/${repo.branch}`]);
+      git(dir, ['reset', '--hard', `origin/${repo.branch}`]);
+      git(dir, ['remote', 'set-head', 'origin', '-a'], { allowFail: true });
+      const afterHead = git(dir, ['rev-parse', '--short', 'HEAD'], { allowFail: true }) || '';
+      if (beforeHead !== afterHead) {
+        console.log(`[reset]  ${repo.path} (${beforeHead} -> ${afterHead})`);
+        changedPaths.push(repo.path);
+      } else {
+        console.log(`[latest] ${repo.path} (${afterHead})`);
+      }
       continue;
     }
 
     const branch = git(dir, ['branch', '--show-current'], { allowFail: true });
     const dirty = Boolean(git(dir, ['status', '--porcelain'], { allowFail: true }));
     if (dirty) {
-      console.log(`[skip]  ${repo.path} (working tree dirty)`);
+      console.log(`[skip]   ${repo.path} (working tree dirty)`);
       continue;
     }
     if (branch !== repo.branch) {
-      console.log(`[skip]  ${repo.path} (on branch ${branch || 'detached'}, expected ${repo.branch})`);
+      console.log(`[skip]   ${repo.path} (on branch ${branch || 'detached'}, expected ${repo.branch})`);
       continue;
     }
-    console.log(`[pull]  ${repo.path}`);
-    execFileSync('git', ['-C', dir, 'pull', '--ff-only'], { stdio: 'inherit' });
+
+    git(dir, ['fetch', 'origin', '--prune']);
+    git(dir, ['pull', '--ff-only', 'origin', repo.branch]);
+    const afterHead = git(dir, ['rev-parse', '--short', 'HEAD'], { allowFail: true }) || '';
+    if (beforeHead !== afterHead) {
+      console.log(`[update] ${repo.path} (${beforeHead} -> ${afterHead})`);
+      changedPaths.push(repo.path);
+    } else {
+      console.log(`[latest] ${repo.path} (${afterHead})`);
+    }
+  }
+
+  if (changedFile) {
+    fs.writeFileSync(changedFile, `${changedPaths.join('\n')}${changedPaths.length ? '\n' : ''}`);
   }
 }
 
@@ -325,6 +360,6 @@ switch (command) {
     await cmdCheck();
     break;
   default:
-    console.error('Usage: node scripts/ws.mjs <status|init|sync [--pull]|check>');
+    console.error('Usage: node scripts/ws.mjs <status|init|sync [--pull|--reset]|check>');
     process.exit(2);
 }
