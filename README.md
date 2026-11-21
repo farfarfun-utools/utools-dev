@@ -17,28 +17,39 @@
 ## 快速开始
 
 ```sh
-# 1. 拉取尚未克隆的子仓库（按 repos.json 中的目录结构）
-node scripts/ws.mjs sync
+# 1. 拉取尚未克隆的子仓库（并发克隆，按 repos.json 目录结构）
+node scripts/ws.mjs init
 
-# 2. 查看全部子仓库的分支、版本与工作区状态
+# 2. 查看根仓库与全部子仓库的分支、版本与工作区状态
 node scripts/ws.mjs status
 
-# 3. 对干净且位于默认分支的子仓库执行 fast-forward 更新
+# 3. 并发更新干净且位于 master 分支的子仓库（fast-forward）
 node scripts/ws.mjs sync --pull
 
-# 4. 执行跨仓库一致性巡检（版本、清单资源、索引、窗口高度、移动端共享代码、截图路径）
+# 4. 清理已合并到 master 的本地旧分支（加 --dry-run 先预览）
+node scripts/ws.mjs prune --dry-run
+
+# 5. 执行跨仓库一致性巡检（版本、清单资源、索引、窗口高度、移动端共享代码、截图路径）
 node scripts/ws.mjs check
 
-# 5. 编译/使用机一键拉取最新并构建全部插件（新 clone 会自动初始化子仓库）
+# 6. 编译/使用机一键拉取最新并构建全部插件（新 clone 会自动初始化子仓库）
 sh scripts/build.sh
 
-# 仅增量构建本次有更新或尚未编译的插件（适合日常更新使用）
+# 仅构建单个或指定几个插件（支持短别名 otp/chat/doc/link/calc/calendar/image/qr/video、大小写不敏感、空格或逗号分隔；只拉取并校验对应插件）
+sh scripts/build.sh otp
+sh scripts/build.sh funchat fundoc
+sh scripts/build.sh --no-pull otp,link
+
+# 编译/使用机推荐：仅增量构建本次有更新或尚未编译的插件（加 --fast 跳过已由 CI 跑过的 lint/单测）
+sh scripts/build.sh --fast --changed
+
+# 仅增量构建（保留完整 lint/类型检查/单测）
 sh scripts/build.sh --changed
 
-# 仅构建指定插件，不拉取远端（适合开发机离线或有未提交改动时）
-sh scripts/build.sh --no-pull funotp funlink
+# 纯编译机镜像模式：强同步到 origin/master 后构建（会丢弃本地修改）
+sh scripts/build.sh --reset
 
-# 预览执行计划 / 查看全部插件列表
+# 预览执行计划 / 查看全部插件别名与编译状态
 sh scripts/build.sh --list
 sh scripts/build.sh --dry-run
 ```

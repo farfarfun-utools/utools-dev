@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate manifest and script syntax
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const data = JSON.parse(fs.readFileSync("repos.json", "utf8"));
+            if (!Array.isArray(data.repos) || data.repos.length === 0) {
+              throw new Error("repos.json must contain a non-empty repos array");
+            }
+            const names = new Set();
+            const paths = new Set();
+            for (const r of data.repos) {
+              for (const key of ["name", "path", "category", "branch", "url"]) {
+                if (!r[key]) throw new Error(`Missing ${key} in ${JSON.stringify(r)}`);
+              }
+              if (names.has(r.name)) throw new Error(`Duplicate name: ${r.name}`);
+              if (paths.has(r.path)) throw new Error(`Duplicate path: ${r.path}`);
+              names.add(r.name);
+              paths.add(r.path);
+            }
+            console.log(`repos.json valid: ${data.repos.length} entries`);
+          '
+          node --check scripts/ws.mjs
+          sh -n scripts/build.sh
+
+      - name: Verify fresh-clone CLI behavior
+        run: |
+          sh scripts/build.sh --help >/dev/null
+          sh scripts/build.sh --list
+          sh scripts/build.sh --dry-run
+          sh scripts/build.sh --dry-run otp
+          sh scripts/build.sh --changed --dry-run FunOTP,link
+          node scripts/ws.mjs status

@@ -5,6 +5,9 @@
 /skills/
 /tools/
 
+# Local build-state cache (tracks last successfully built commit per plugin)
+/.cache/
+
 # Local OS / editor artifacts
 .DS_Store
 Thumbs.db
