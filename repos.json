@@ -58,6 +58,14 @@
       "description": "图片工坊 FunImage"
     },
     {
+      "name": "utools-funjson",
+      "path": "plugins/utools-funjson",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funjson.git",
+      "description": "数形万变 FunJSON"
+    },
+    {
       "name": "utools-funlink",
       "path": "plugins/utools-funlink",
       "category": "plugin",

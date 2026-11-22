@@ -2,7 +2,7 @@
 
 本仓库是 `farfarfun-utools` 组织的聚合工作区，各子仓库通过 `repos.json` 组织在以下目录中：
 
-- `plugins/utools-fun*`：9 个 uTools 插件
+- `plugins/utools-fun*`：10 个 uTools 插件
 - `apps/utools-mobile`：FunMobile Android 应用（复用 FunOTP / FunLink 的纯业务逻辑）
 - `tools/utools-shots`：FunChat / FunDoc / FunLink / FunOTP 的截图脚本生成端
 - `index/utools-plugins`：全组织插件索引仓库

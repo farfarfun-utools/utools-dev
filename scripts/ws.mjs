@@ -469,7 +469,7 @@ async function cmdCheck(args = []) {
     const identityPath = path.join(dir, 'identity.json');
     if (fs.existsSync(identityPath)) {
       const identity = readJson(identityPath);
-      if (!identity.pluginId) fail(`${repo.path}: identity.json missing pluginId`);
+      if (!identity.pluginId) warn(`${repo.path}: identity.json pluginId is empty (register on uTools before release)`);
       for (const secretKey of ['mid', 'uid', 'cellphone']) {
         if (secretKey in identity) fail(`${repo.path}: identity.json must not contain private field "${secretKey}"`);
       }
