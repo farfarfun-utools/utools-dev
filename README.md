@@ -8,7 +8,7 @@
 
 | 目录 | 说明 | 包含仓库 |
 | :--- | :--- | :--- |
-| `plugins/` | 10 个本地优先的 uTools 插件 | `utools-funcalc`, `utools-funcalendar`, `utools-funchat`, `utools-fundoc`, `utools-funimage`, `utools-funjson`, `utools-funlink`, `utools-funotp`, `utools-funqr`, `utools-funvideo` |
+| `plugins/` | 10 个本地优先的 uTools 插件 | `utools-funcalc`, `utools-funcalendar`, `utools-funchat`, `utools-fundata`, `utools-fundoc`, `utools-funimage`, `utools-funlink`, `utools-funotp`, `utools-funqr`, `utools-funvideo` |
 | `apps/` | 移动端伴侣应用 | `utools-mobile`（FunMobile Android：内置 FunOTP + FunLink） |
 | `tools/` | 跨仓库共享工具 | `utools-shots`（4 个 Vue 插件的 CDP 截图脚本生成与预览工具链） |
 | `index/` | 组织插件总索引 | `utools-plugins` |
@@ -35,7 +35,7 @@ node scripts/ws.mjs check
 # 6. 编译/使用机一键拉取最新并构建全部插件（新 clone 会自动初始化子仓库）
 sh scripts/build.sh
 
-# 仅构建单个或指定几个插件（支持短别名 otp/chat/doc/link/calc/calendar/image/json/qr/video、大小写不敏感、空格或逗号分隔；只拉取并校验对应插件）
+# 仅构建单个或指定几个插件（支持短别名 otp/chat/data/doc/link/calc/calendar/image/qr/video、大小写不敏感、空格或逗号分隔；只拉取并校验对应插件）
 sh scripts/build.sh otp
 sh scripts/build.sh funchat fundoc
 sh scripts/build.sh --no-pull otp,link
