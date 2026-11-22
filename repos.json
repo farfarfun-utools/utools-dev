@@ -66,6 +66,14 @@
       "description": "数形万变 FunData"
     },
     {
+      "name": "utools-funjson",
+      "path": "plugins/utools-funjson",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funjson.git",
+      "description": "JSON工坊 FunJSON"
+    },
+    {
       "name": "utools-funlink",
       "path": "plugins/utools-funlink",
       "category": "plugin",
