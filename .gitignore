@@ -1,8 +1,8 @@
 # Multi-repo checkouts managed by repos.json + scripts/ws.mjs
+/.agents/
 /apps/
 /index/
 /plugins/
-/skills/
 /tools/
 
 # Local build-state cache (tracks last successfully built commit per plugin)

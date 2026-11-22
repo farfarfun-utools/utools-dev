@@ -106,12 +106,12 @@
       "description": "视频工坊 FunVideo"
     },
     {
-      "name": "utools-plugin-development",
-      "path": "skills/utools-plugin-development",
-      "category": "skill",
+      "name": "utools-agents",
+      "path": ".agents",
+      "category": "agents",
       "branch": "master",
-      "url": "https://github.com/farfarfun-utools/utools-plugin-development.git",
-      "description": "uTools plugin development & release skill"
+      "url": "https://github.com/farfarfun-utools/utools-agents.git",
+      "description": "uTools AI Agent configuration and skills (.agents/)"
     },
     {
       "name": "utools-shots",

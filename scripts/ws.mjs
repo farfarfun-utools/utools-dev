@@ -385,7 +385,7 @@ async function cmdCheck(args = []) {
   // 2. Load index README and current-state doc for cross-checking (when present)
   const indexReadmePath = path.join(ROOT, 'index/utools-plugins/README.md');
   const indexReadme = fs.existsSync(indexReadmePath) ? fs.readFileSync(indexReadmePath, 'utf8') : '';
-  const stateDocPath = path.join(ROOT, 'skills/utools-plugin-development/references/current-state.md');
+  const stateDocPath = path.join(ROOT, '.agents/skills/utools-plugin-development/references/current-state.md');
   const stateDoc = fs.existsSync(stateDocPath) ? fs.readFileSync(stateDocPath, 'utf8') : '';
 
   const stateHeights = new Map();
@@ -459,6 +459,11 @@ async function cmdCheck(args = []) {
       if (feat.icon && !fs.existsSync(path.join(utoolsDir, feat.icon))) {
         fail(`${repo.path}: missing feature icon utools/${feat.icon}`);
       }
+      if (!Array.isArray(feat.cmds) || feat.cmds.length === 0) {
+        fail(`${repo.path}: feature "${feat.code}" must define at least 1 cmd`);
+      } else if (feat.cmds.length > 5) {
+        fail(`${repo.path}: feature "${feat.code}" has ${feat.cmds.length} cmds (uTools allows at most 5 per feature)`);
+      }
     }
 
     for (const required of ['build.sh', 'identity.json', '.github/workflows/ci.yml', '.github/workflows/release.yml']) {
@@ -489,7 +494,7 @@ async function cmdCheck(args = []) {
     const docHeight = stateHeights.get(shortKey);
     const actualHeight = plugin.pluginSetting?.height;
     if (docHeight !== undefined && actualHeight !== undefined && docHeight !== actualHeight) {
-      fail(`skills/.../current-state.md height mismatch for ${repo.name}: doc=${docHeight}, plugin.json=${actualHeight}`);
+      fail(`.agents/skills/utools-plugin-development/references/current-state.md height mismatch for ${repo.name}: doc=${docHeight}, plugin.json=${actualHeight}`);
     }
   }
 

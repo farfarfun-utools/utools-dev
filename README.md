@@ -12,7 +12,7 @@
 | `apps/` | 移动端伴侣应用 | `utools-mobile`（FunMobile Android：内置 FunOTP + FunLink） |
 | `tools/` | 跨仓库共享工具 | `utools-shots`（4 个 Vue 插件的 CDP 截图脚本生成与预览工具链） |
 | `index/` | 组织插件总索引 | `utools-plugins` |
-| `skills/` | 开发与发布规范 Skill | `utools-plugin-development` |
+| `.agents/` | AI Agent 配置与多 Skill 仓库 | `utools-agents`（含 `skills/utools-plugin-development`） |
 
 ## 快速开始
 
@@ -58,7 +58,7 @@ sh scripts/build.sh --dry-run
 
 - **单插件构建入口**：每个插件根目录及 `apps/utools-mobile` 均提供 `sh build.sh` 作为本地校验与 CI 的统一入口。
 - **截图脚本维护**：`utools-funchat`、`utools-fundoc`、`utools-funlink`、`utools-funotp` 的 `scripts/screenshots.mjs` 和 `scripts/cdp.mjs` 由 `tools/utools-shots/build-scripts.mjs` 生成，不要只手改目标仓库的产物。
-- **开发与发版规范**：详见 `skills/utools-plugin-development/SKILL.md`。
+- **开发与发版规范**：详见 `.agents/skills/utools-plugin-development/SKILL.md`。
 
 ## 协议
 
