@@ -90,6 +90,14 @@
       "description": "一链即达 FunLink"
     },
     {
+      "name": "utools-funmeme",
+      "path": "plugins/utools-funmeme",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funmeme.git",
+      "description": "趣图生花 FunMeme"
+    },
+    {
       "name": "utools-funotp",
       "path": "plugins/utools-funotp",
       "category": "plugin",
@@ -104,6 +112,14 @@
       "branch": "master",
       "url": "https://github.com/farfarfun-utools/utools-funqr.git",
       "description": "码上生花 FunQR"
+    },
+    {
+      "name": "utools-funtime",
+      "path": "plugins/utools-funtime",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funtime.git",
+      "description": "分秒必争 FunTime"
     },
     {
       "name": "utools-funvideo",

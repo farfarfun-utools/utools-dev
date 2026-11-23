@@ -18,9 +18,9 @@ Usage: sh scripts/build.sh [options] [plugin...]
 Pull latest workspace & plugin repositories (auto-cloning any missing ones)
 and run unified build.sh for all plugins or specified plugin(s).
 
-Targets (default / "all": all 12 plugins under plugins/*):
+Targets (default / "all": all 14 plugins under plugins/*):
   <name>           Case-insensitive match by alias (otp, chat, color, data, doc, json,
-                   link, calc, calendar, image, qr, video), short name (funotp),
+                   link, meme, time, calc, calendar, image, qr, video), short name (funotp),
                    repo name (utools-funotp), or path (plugins/utools-funotp).
                    Supports space- or comma-separated lists (e.g. otp,link).
                    When specific plugin(s) are given, only those plugin repos
@@ -47,7 +47,7 @@ Options:
   -h, --help       Show this help message
 
 Examples:
-  sh scripts/build.sh                    # Sync all repos & build all 12 plugins
+  sh scripts/build.sh                    # Sync all repos & build all 14 plugins
   sh scripts/build.sh --fast --changed   # Fast incremental build on build machine
   sh scripts/build.sh otp                # Sync & build only utools-funotp
   sh scripts/build.sh funchat fundoc     # Sync & build only FunChat & FunDoc
