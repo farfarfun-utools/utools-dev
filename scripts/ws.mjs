@@ -421,9 +421,16 @@ async function cmdCheck(args = []) {
     }
     const npmLockPath = path.join(dir, 'package-lock.json');
     if (fs.existsSync(npmLockPath)) {
-      const lock = readJson(npmLockPath);
+      const lockRaw = fs.readFileSync(npmLockPath, 'utf8');
+      const lock = JSON.parse(lockRaw);
       if (lock.version !== pkg.version || lock.packages?.['']?.version !== pkg.version) {
         fail(`${repo.path}: package-lock.json version mismatch (expected ${pkg.version})`);
+      }
+      const nonCanonical = [...lockRaw.matchAll(/"resolved":\s*"(https?:\/\/[^"]+)"/g)]
+        .map((m) => m[1])
+        .filter((u) => !u.startsWith('https://registry.npmjs.org/'));
+      if (nonCanonical.length > 0) {
+        fail(`${repo.path}: package-lock.json contains ${nonCanonical.length} non-npmjs resolved URL(s) (e.g. ${nonCanonical[0]}); normalize to https://registry.npmjs.org/ to avoid npm 12 EALLOWREMOTE`);
       }
     }
     if (!pkg.name?.startsWith('@farfarfun/utools-')) {
