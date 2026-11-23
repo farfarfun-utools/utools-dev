@@ -42,6 +42,14 @@
       "description": "言来语往 FunChat"
     },
     {
+      "name": "utools-funcolor",
+      "path": "plugins/utools-funcolor",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funcolor.git",
+      "description": "拾色生花 FunColor"
+    },
+    {
       "name": "utools-fundoc",
       "path": "plugins/utools-fundoc",
       "category": "plugin",
