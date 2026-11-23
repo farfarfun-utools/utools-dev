@@ -18,9 +18,9 @@ Usage: sh scripts/build.sh [options] [plugin...]
 Pull latest workspace & plugin repositories (auto-cloning any missing ones)
 and run unified build.sh for all plugins or specified plugin(s).
 
-Targets (default / "all": all 9 plugins under plugins/*):
-  <name>           Case-insensitive match by alias (otp, chat, doc, link,
-                   calc, calendar, image, qr, video), short name (funotp),
+Targets (default / "all": all 11 plugins under plugins/*):
+  <name>           Case-insensitive match by alias (otp, chat, data, doc, json,
+                   link, calc, calendar, image, qr, video), short name (funotp),
                    repo name (utools-funotp), or path (plugins/utools-funotp).
                    Supports space- or comma-separated lists (e.g. otp,link).
                    When specific plugin(s) are given, only those plugin repos
@@ -42,18 +42,19 @@ Options:
   --dry-run        Print planned sync/check/build commands without executing
   --check-only     Only sync/pull and run consistency check (ws.mjs check)
   --no-check       Skip consistency check (node scripts/ws.mjs check)
-  -k, --keep-going Continue building remaining plugins after a failure
+  -k, --keep-going Continue building remaining plugins after a failure (default)
+  --fail-fast      Abort immediately on the first plugin build failure
   -h, --help       Show this help message
 
 Examples:
-  sh scripts/build.sh                    # Sync all repos & build all 9 plugins
+  sh scripts/build.sh                    # Sync all repos & build all 11 plugins
   sh scripts/build.sh --fast --changed   # Fast incremental build on build machine
   sh scripts/build.sh otp                # Sync & build only utools-funotp
   sh scripts/build.sh funchat fundoc     # Sync & build only FunChat & FunDoc
   sh scripts/build.sh --no-pull otp,link # Build FunOTP & FunLink without pulling
 
 Passthrough environment variables (honored by individual plugin build.sh scripts):
-  SKIP_CHECKS=1      Skip lint/typecheck/test across all 9 plugins (same as --fast)
+  SKIP_CHECKS=1      Skip lint/typecheck/test across all plugins (same as --fast)
   RUN_E2E=1          Run Playwright E2E tests (e.g. funcalc)
   RUN_FFMPEG_TEST=1  Run FFmpeg integration tests (funvideo)
 EOF
@@ -118,7 +119,7 @@ AUTO_PULL=1
 AUTO_SYNC=1
 CHECK_ONLY=0
 RUN_CHECK=1
-KEEP_GOING=0
+KEEP_GOING=1
 SYNC_JOBS=5
 TARGETS=""
 
@@ -174,6 +175,9 @@ while [ "$#" -gt 0 ]; do
       ;;
     -k|--keep-going)
       KEEP_GOING=1
+      ;;
+    --fail-fast)
+      KEEP_GOING=0
       ;;
     -h|--help)
       usage
@@ -303,8 +307,9 @@ fi
 TMP_TARGETS=$(mktemp)
 TMP_CHANGED=$(mktemp)
 TMP_BUILT=$(mktemp)
+TMP_FAILED=$(mktemp)
 TMP_TO_BUILD=$(mktemp)
-trap 'rm -f "$TMP_TARGETS" "$TMP_CHANGED" "$TMP_BUILT" "$TMP_TO_BUILD"' EXIT INT TERM
+trap 'rm -f "$TMP_TARGETS" "$TMP_CHANGED" "$TMP_BUILT" "$TMP_FAILED" "$TMP_TO_BUILD"' EXIT INT TERM
 printf "%s\n" "$RESOLVED_LIST" > "$TMP_TARGETS"
 
 # Build space-separated repo path list for scoped ws.mjs sync/check
@@ -554,6 +559,7 @@ while IFS='	' read -r repo_path repo_name short_name alias_name repo_state dist_
     echo "error: missing $repo_path/build.sh (run 'node scripts/ws.mjs init $repo_path' first)" >&2
     FAILED=$((FAILED + 1))
     FAILED_LIST="${FAILED_LIST}${FAILED_LIST:+, }${repo_path}"
+    printf "%s\t%s\t%s\n" "$repo_path" "missing build.sh" "0s" >> "$TMP_FAILED"
     if [ "$KEEP_GOING" != 1 ]; then
       exit 1
     fi
@@ -568,7 +574,7 @@ while IFS='	' read -r repo_path repo_name short_name alias_name repo_state dist_
     ELAPSED=$((END_TS - START_TS))
     echo "--- [ok] $repo_path (${ELAPSED}s) ---"
     PASSED=$((PASSED + 1))
-    printf "%s\n" "$ROOT_DIR/$repo_path/utools/plugin.json" >> "$TMP_BUILT"
+    printf "%s\t%s\t%s\n" "$repo_path" "${ELAPSED}s" "$ROOT_DIR/$repo_path/utools/plugin.json" >> "$TMP_BUILT"
 
     # Record last successfully built commit SHA for accurate --changed tracking
     node -e '
@@ -598,10 +604,11 @@ fs.writeFileSync(revsFile, JSON.stringify(data, null, 2) + "\n");
     echo "--- [fail] $repo_path (exit $STATUS, ${ELAPSED}s) ---" >&2
     FAILED=$((FAILED + 1))
     FAILED_LIST="${FAILED_LIST}${FAILED_LIST:+, }${repo_path}"
+    printf "%s\t%s\t%s\n" "$repo_path" "exit $STATUS" "${ELAPSED}s" >> "$TMP_FAILED"
     if [ "$KEEP_GOING" != 1 ]; then
       echo "" >&2
-      echo "Build aborted on $repo_path (use -k/--keep-going to continue on failure)." >&2
-      exit "$STATUS"
+      echo "Build aborted on $repo_path (--fail-fast enabled)." >&2
+      break
     fi
   fi
 done < "$TMP_TO_BUILD"
@@ -615,14 +622,21 @@ if [ "$DRY_RUN" = 1 ]; then
   exit 0
 fi
 
-echo "Summary: $PASSED/$TOTAL succeeded, $FAILED failed, $SKIPPED skipped (${RUN_ELAPSED}s)."
+echo "=== Build Summary: $PASSED/$TOTAL succeeded, $FAILED failed, $SKIPPED skipped (${RUN_ELAPSED}s) ==="
+echo "Succeeded ($PASSED):"
 if [ -s "$TMP_BUILT" ]; then
-  echo "Ready plugin.json manifests:"
-  while IFS= read -r manifest_file; do
-    echo "  - $manifest_file"
+  while IFS='	' read -r ok_path ok_elapsed ok_manifest; do
+    echo "  [ok]   $ok_path ($ok_elapsed) -> $ok_manifest"
   done < "$TMP_BUILT"
+else
+  echo "  (none)"
 fi
-if [ "$FAILED" -gt 0 ]; then
-  echo "Failed plugins: $FAILED_LIST" >&2
+echo "Failed ($FAILED):"
+if [ -s "$TMP_FAILED" ]; then
+  while IFS='	' read -r fail_path fail_reason fail_elapsed; do
+    echo "  [fail] $fail_path ($fail_reason, $fail_elapsed)"
+  done < "$TMP_FAILED"
   exit 1
+else
+  echo "  (none)"
 fi
