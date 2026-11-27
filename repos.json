@@ -114,6 +114,14 @@
       "description": "码上生花 FunQR"
     },
     {
+      "name": "utools-funsecret",
+      "path": "plugins/utools-funsecret",
+      "category": "plugin",
+      "branch": "master",
+      "url": "https://github.com/farfarfun-utools/utools-funsecret.git",
+      "description": "密藏随行 FunSecret"
+    },
+    {
       "name": "utools-funtime",
       "path": "plugins/utools-funtime",
       "category": "plugin",
